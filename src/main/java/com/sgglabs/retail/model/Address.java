@@ -1,5 +1,6 @@
 package com.sgglabs.retail.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,14 +28,14 @@ import java.util.Objects;
  * );
  */
 
-@Entity
+@Entity(name = "Address")
 @Table(name = "Address")
 public class Address {
     private static final Logger LOG = LoggerFactory.getLogger(Address.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "Line1")
     private String addressLine1;
@@ -54,8 +55,13 @@ public class Address {
     @Column(name = "AddressTypeId")
     private String addressTypeId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UserTId")
+    @JsonBackReference
+    private User user;
+
     @Column(name = "StatusId")
-    private String statusId;
+    private Integer statusId;
 
     @Column(name = "CreatedDate")
     private LocalDate createdDate;
@@ -66,11 +72,11 @@ public class Address {
     public Address() {
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -122,11 +128,19 @@ public class Address {
         this.addressTypeId = addressTypeId;
     }
 
-    public String getStatusId() {
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Integer getStatusId() {
         return statusId;
     }
 
-    public void setStatusId(String statusId) {
+    public void setStatusId(Integer statusId) {
         this.statusId = statusId;
     }
 
@@ -158,6 +172,7 @@ public class Address {
                 Objects.equals(country, address.country) &&
                 Objects.equals(postCode, address.postCode) &&
                 Objects.equals(addressTypeId, address.addressTypeId) &&
+                Objects.equals(user.getId(), address.user.getId()) &&
                 Objects.equals(statusId, address.statusId) &&
                 Objects.equals(createdDate, address.createdDate) &&
                 Objects.equals(modifiedDate, address.modifiedDate);
@@ -166,7 +181,7 @@ public class Address {
     @Override
     public int hashCode() {
         return Objects.hash(id, addressLine1, addressLine2, city, country, postCode, addressTypeId,
-                statusId, createdDate, modifiedDate);
+                user.getId(), statusId, createdDate, modifiedDate);
     }
 
     @Override
@@ -179,6 +194,7 @@ public class Address {
                 ", country='" + country + '\'' +
                 ", postCode='" + postCode + '\'' +
                 ", addressTypeId='" + addressTypeId + '\'' +
+                ", user='" + user.getUserName() + '\'' +
                 ", statusId='" + statusId + '\'' +
                 ", createdDate=" + createdDate +
                 ", modifiedDate=" + modifiedDate +

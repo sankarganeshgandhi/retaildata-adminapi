@@ -1,10 +1,13 @@
 package com.sgglabs.retail.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,17 +26,20 @@ import java.util.Objects;
  * FOREIGN KEY (StatusId) REFERENCES Status(Id)
  * );
  */
-@Entity
+@Entity(name = "User")
 @Table(name = "UserT")
 public class User {
     private static final Logger LOG = LoggerFactory.getLogger(User.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "Username")
     private String userName;
+
+    @Column(name = "Password")
+    private String password;
 
     @Column(name = "FirstName")
     private String firstName;
@@ -48,7 +54,7 @@ public class User {
     private String phoneNumber;
 
     @Column(name = "StatusId")
-    private String statusId;
+    private Integer statusId;
 
     @Column(name = "CreatedDate")
     private LocalDate createdDate;
@@ -56,14 +62,22 @@ public class User {
     @Column(name = "ModifiedDate")
     private LocalDate modifiedDate;
 
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    private List<Address> addresses = new ArrayList<>();
+
     public User() {
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -73,6 +87,14 @@ public class User {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -107,11 +129,29 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getStatusId() {
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    public void addAddress(Address address) {
+        this.addresses.add(address);
+        address.setUser(this);
+    }
+
+    public void removeAddress(Address address) {
+        this.addresses.remove(address);
+        address.setUser(null);
+    }
+
+    public Integer getStatusId() {
         return statusId;
     }
 
-    public void setStatusId(String statusId) {
+    public void setStatusId(Integer statusId) {
         this.statusId = statusId;
     }
 
@@ -144,13 +184,14 @@ public class User {
                 Objects.equals(phoneNumber, user.phoneNumber) &&
                 Objects.equals(statusId, user.statusId) &&
                 Objects.equals(createdDate, user.createdDate) &&
-                Objects.equals(modifiedDate, user.modifiedDate);
+                Objects.equals(modifiedDate, user.modifiedDate) &&
+                Objects.equals(addresses, user.addresses);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName, firstName, lastName, emailAddress, phoneNumber, statusId,
-                createdDate, modifiedDate);
+        return Objects.hash(id, userName, firstName, lastName, emailAddress, phoneNumber,
+                statusId, createdDate, modifiedDate, addresses);
     }
 
     @Override
@@ -165,6 +206,7 @@ public class User {
                 ", statusId='" + statusId + '\'' +
                 ", createdDate=" + createdDate +
                 ", modifiedDate=" + modifiedDate +
+                ", addresses=" + addresses +
                 '}';
     }
 }

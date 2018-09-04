@@ -63,3 +63,29 @@ INSERT INTO AddressType(Description, StatusId, CreatedDate, ModifiedDate)
     VALUES ("Personal", 2, Now(), Now());
 INSERT INTO AddressType(Description, StatusId, CreatedDate, ModifiedDate)
     VALUES ("Communication", 2, Now(), Now());
+
+INSERT INTO UserT(Username, Password, FirstName, LastName, EmailAddress, PhoneNumber, StatusId, CreatedDate,
+    ModifiedDate)
+    VALUES ("sankarg", "welcome123!", "Sankarganesh", "Gandhi", "sankarganesh.gandhi@gmail.com",
+    "07946318867", 2, Now(), Now());
+
+INSERT INTO Address(Line1, Line2, City, Country, Postcode, AddressTypeId, UserTId, StatusId, CreatedDate,
+    ModifiedDate)
+    VALUES ("Address Line1", "Address Line2", "Manchester", "UK", "M210BH",
+    1, 1, 2, Now(), Now());
+
+DROP TABLE AuthSession;
+
+CREATE TABLE AuthSession (
+    Id BIGINT(10) NOT NULL AUTO_INCREMENT,
+    UserId INT(10) NOT NULL,
+    Username VARCHAR(30) NOT NULL,
+    SessionId VARCHAR(250) NOT NULL,
+    LoginTime DATE NOT NULL,
+    LogoutTime DATE,
+    StatusId INT(2) NOT NULL,
+    CreatedDate DATE,
+    ModifiedDate DATE,
+    PRIMARY KEY (Id),
+    FOREIGN KEY (StatusId) REFERENCES Status(Id)
+) ENGINE = INNODB;
